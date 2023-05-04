@@ -1,15 +1,10 @@
 # data loader
 from __future__ import print_function, division
-import glob
 import torch
 from skimage import io, transform, color
 import numpy as np
 import random
-import math
-import matplotlib.pyplot as plt
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils
-from PIL import Image
+from torch.utils.data import Dataset
 
 #==========================dataset load==========================
 class RescaleT(object):
@@ -40,7 +35,7 @@ class RescaleT(object):
 		img = transform.resize(image,(self.output_size,self.output_size),mode='constant')
 		lbl = transform.resize(label,(self.output_size,self.output_size),mode='constant', order=0, preserve_range=True)
 
-		return {'imidx':imidx, 'image':img,'label':lbl}
+		return {'imidx':imidx, 'image':img, 'label':lbl}
 
 class Rescale(object):
 
