@@ -385,7 +385,7 @@ def save_figs(names, clses, boxes, save_dir):
 def main():
     no = 1
     save_dir = f"output/result_plot/"
-    names = torch.load("test_order.pt")
+    names = torch.load("output/test_order.pt")
     print("len:", len(names))
     clses = torch.load("output/clses-Epoch300.pt")
     boxes = torch.load("output/boxes-Epoch300.pt")

@@ -50,7 +50,7 @@ def initialize_model(model_path = MODEL_PATH):
     return net
 
 
-def get_saliency_batch(net, image_dir=INPUT_DIR, output_dir=OUTPUT_DIR):
+def get_batch_saliency(net, image_dir=INPUT_DIR, output_dir=OUTPUT_DIR):
 
     print(image_dir)
     img_name_list = glob.glob(image_dir + os.sep + '*')
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     net = initialize_model()
 
     print("------- Batch Test -------")
-    ret = get_saliency_batch(net)
+    ret = get_batch_saliency(net)
     print(ret)
 
     print("------- Single Test -------")

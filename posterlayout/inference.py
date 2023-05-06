@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Oct 15 14:08:12 2022
-
-@author: shyoh
-"""
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -68,10 +62,10 @@ def test(G, testing_dl, epoch_n):
 def main():
     global fix_noise, no
     test_bg_path = "Dataset/test/image_canvas"
-    # test_sal_dir_1 = "Dataset/test/saliencymaps_pfpn"
-    # test_sal_dir_2 = "Dataset/test/saliencymaps_basnet"
-    test_sal_dir_1 = "Dataset/test/image_canvas_res"
-    test_sal_dir_2 = "Dataset/test/image_canvas_res"
+    test_sal_dir_1 = "Dataset/test/saliencymaps_pfpn"
+    test_sal_dir_2 = "Dataset/test/saliencymaps_basnet"
+    # test_sal_dir_1 = "Dataset/test/image_canvas_res"
+    # test_sal_dir_2 = "Dataset/test/image_canvas_res"
     test_batch_size = 1
     
     ckpt_path = "output/DS-GAN-Epoch300.pth"
@@ -98,6 +92,7 @@ def main():
         
     new_state_dict = OrderedDict()
     for k, v in ckpt.items():
+        # print(k, v)
         name = k[7:] # remove module.
         new_state_dict[name] = v
     
@@ -106,6 +101,7 @@ def main():
     if gpu:
         G = G.to(device)
         G = torch.nn.DataParallel(G, device_ids=device_ids)
+        # G = torch.nn.DataParallel(G)
         
     test(G, testing_dl, 1)
 

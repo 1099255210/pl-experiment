@@ -80,7 +80,7 @@ class canvas(Dataset):
         if train:
             img = img[:4]
         else:
-            torch.save(img, "test_order.pt")
+            torch.save(img, "output/test_order.pt")
         self.bg = list(map(lambda x: os.path.join(bg_dir, x), img))
         # self.sal_1 = list(map(lambda x: os.path.join(sal_dir_1, x.replace(".png", "_pred.png")), img))
         self.sal_1 = list(map(lambda x: os.path.join(sal_dir_1, x), img))
