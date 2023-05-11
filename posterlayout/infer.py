@@ -48,30 +48,36 @@ def random_init(batch, max_elem):
     init_layout = torch.concat([cls.unsqueeze(2), box], dim=2)
     return init_layout
 
-def test(G, testing_dl, epoch_n):
-    global fix_noise, no
+def test(G, testing_dl):
+    global fix_noise
     G.eval()
     clses = []
     boxes = []
     with torch.no_grad():
         for imgs in testing_dl:
             imgs = imgs.to(device)
-            cls, box = G(imgs, fix_noise)
+            cls, box = G(imgs, fix_noise.to(device))
             clses.append(torch.argmax(cls.detach().cpu(), dim=-1, keepdim=True))
-            boxes.append(box_cxcywh_to_xyxy(box.detach().cpu()))            
+            boxes.append(box_cxcywh_to_xyxy(box.detach().cpu()))
     clses = torch.concat(clses, dim=0).numpy()
     boxes = torch.concat(boxes, dim=0).numpy()
+
+    boxes[:, :, ::2] *= 513
+    boxes[:, :, 1::2] *= 750
+    clses = np.array(clses, dtype=int)
+    boxes = np.array(boxes, dtype=int)
+    # print(clses, boxes)
     
     torch.save(clses, f"output/clses-Epoch300.pt")
     torch.save(boxes, f"output/boxes-Epoch300.pt")
     
 def main():
     global fix_noise, no
-    test_bg_path = "Dataset/test/image_canvas"
+    test_bg_path = "test_assets/img"
     # test_sal_dir_1 = "Dataset/test/saliencymaps_pfpn"
     # test_sal_dir_2 = "Dataset/test/saliencymaps_basnet"
-    test_sal_dir_1 = "Dataset/test/image_canvas_res"
-    test_sal_dir_2 = "Dataset/test/image_canvas_res"
+    test_sal_dir_1 = "test_assets/sal"
+    test_sal_dir_2 = "test_assets/sal"
     test_batch_size = 1
     
     ckpt_path = "output/DS-GAN-Epoch300.pth"
@@ -105,9 +111,8 @@ def main():
     
     if gpu:
         G = G.to(device)
-        G = torch.nn.DataParallel(G, device_ids=device_ids)
         
-    test(G, testing_dl, 1)
+    test(G, testing_dl)
 
 if __name__ == "__main__":
     main()

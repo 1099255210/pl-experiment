@@ -22,12 +22,10 @@ def box_xyxy_to_cxcywh(x):
     return torch.stack(b, dim=-1)
 
 class canvasLayout(Dataset):
-    def __init__(self, inp_dir, sal_dir_1, sal_dir_2, csv_path, max_elem=8):
+    def __init__(self, inp_dir, sal_dir, csv_path, max_elem=8):
         img = os.listdir(inp_dir)
         self.inp = list(map(lambda x: os.path.join(inp_dir, x), img))
-        # self.sal_1 = list(map(lambda x: os.path.join(sal_dir_1, x.replace(".png", "_pred.png")), img))
-        self.sal_1 = list(map(lambda x: os.path.join(sal_dir_1, x), img))
-        self.sal_2 = list(map(lambda x: os.path.join(sal_dir_2, x), img))
+        self.sal = list(map(lambda x: os.path.join(sal_dir, x), img))
         
         df = read_csv(csv_path)
         self.max_elem = max_elem
@@ -44,9 +42,7 @@ class canvasLayout(Dataset):
      
     def __getitem__(self, idx):
         img_inp = Image.open(self.inp[idx]).convert("RGB")
-        img_sal_1 = Image.open(self.sal_1[idx]).convert("L")
-        img_sal_2 = Image.open(self.sal_2[idx]).convert("L")
-        img_sal = Image.fromarray(np.maximum(np.array(img_sal_1), np.array(img_sal_2)))
+        img_sal = Image.open(self.sal_1[idx]).convert("L")
          
         img_inp = self.transform(img_inp)
         img_sal = self.transform(img_sal)
@@ -75,16 +71,14 @@ class canvasLayout(Dataset):
         return cc, torch.tensor(label).float()
     
 class canvas(Dataset):
-    def __init__(self, bg_dir, sal_dir_1, sal_dir_2, train=True):
+    def __init__(self, bg_dir, sal_dir, train=True):
         img = os.listdir(bg_dir)
         if train:
             img = img[:4]
         else:
             torch.save(img, "output/test_order.pt")
         self.bg = list(map(lambda x: os.path.join(bg_dir, x), img))
-        # self.sal_1 = list(map(lambda x: os.path.join(sal_dir_1, x.replace(".png", "_pred.png")), img))
-        self.sal_1 = list(map(lambda x: os.path.join(sal_dir_1, x), img))
-        self.sal_2 = list(map(lambda x: os.path.join(sal_dir_2, x), img))
+        self.sal = list(map(lambda x: os.path.join(sal_dir, x), img))
         
         self.transform = transforms.Compose([
             transforms.Resize([350, 240]),
@@ -96,9 +90,7 @@ class canvas(Dataset):
     
     def __getitem__(self, idx):
         img_bg = Image.open(self.bg[idx]).convert("RGB")
-        img_sal_1 = Image.open(self.sal_1[idx]).convert("L")
-        img_sal_2 = Image.open(self.sal_2[idx]).convert("L")
-        img_sal = Image.fromarray(np.maximum(np.array(img_sal_1), np.array(img_sal_2)))
+        img_sal = Image.open(self.sal[idx]).convert("L")
         
         img_bg = self.transform(img_bg)
         img_sal = self.transform(img_sal)

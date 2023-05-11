@@ -7,14 +7,15 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-from data_loader import RescaleT
-from data_loader import ToTensorLab
-from data_loader import SalObjDataset
+from .data_loader import RescaleT
+from .data_loader import ToTensorLab
+from .data_loader import SalObjDataset
 
-from model import U2NET # full size version 173.6 MB
-from model import U2NETP # small version u2net 4.7 MB
+from .model import U2NET # full size version 173.6 MB
+from .model import U2NETP # small version u2net 4.7 MB
 
-MODEL_PATH = './saved_models/u2net/u2net.pth'
+CWD = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(CWD, 'saved_models/u2net/u2net.pth')
 INPUT_DIR = 'test_assets'
 OUTPUT_DIR = 'output'
 
