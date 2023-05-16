@@ -109,13 +109,9 @@ def get_result(G, img_list, noise_layout):
             clses.append(cls)
             boxes.append(box)
     return clses, boxes
-    
-def get_single_layout(
-        image_path:str='test_assets/img/3.png',
-        sal_path:str='test_assets/sal/3.png'
-    ):
+   
 
-    max_elem = 32
+def initialize_model(max_elem = 32, ckpt_path = "output/DS-GAN-Epoch300.pth"):
     args_g = {
         "backbone": "resnet50",
         "in_channels": 8,
@@ -127,7 +123,6 @@ def get_single_layout(
     }
     G = generator(args_g)
     
-    ckpt_path = "output/DS-GAN-Epoch300.pth"
     ckpt = torch.load(ckpt_path)
     new_state_dict = OrderedDict()
     for k, v in ckpt.items():
@@ -137,6 +132,17 @@ def get_single_layout(
 
     if gpu:
         G = G.to(device)
+        
+    return G
+
+ 
+def get_single_layout(
+        G:generator,
+        image_path:str='test_assets/img/3.png',
+        sal_path:str='test_assets/sal/3.png',
+        out_dir:str='test_assets/output',
+        max_elem:int=32,
+    ):
 
     noise_layout = random_init(1, max_elem)
 
@@ -152,7 +158,10 @@ def get_single_layout(
 
     img = Image.new('RGBA', LAYOUT_SIZE, (255, 255, 255))
     img = draw_box(img, zip(cls, box))
-    img.save('layout.png')
+    
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+    img.save(os.path.join(out_dir, 'layout.png'))
 
 def get_batch_layout(
         image_dir:str='test_assets/img',
@@ -209,15 +218,18 @@ def test_inference():
     import u2net.inference as u2
 
     salnet = u2.initialize_model()
+    layoutnet = initialize_model()
+    
+    s = input('start')
 
-    img_path = 'test_assets/img/3.png'
+    img_path = 'test_assets/img/8_.png'
     out_dir = 'test_assets/sal_u2'
 
     ret_path = u2.get_single_saliency(salnet, img_path, out_dir)
 
     print(ret_path)
 
-    get_single_layout(image_path=img_path, sal_path=ret_path)
+    get_single_layout(layoutnet, image_path=img_path, sal_path=ret_path)
 
 
 def test_random_init():
